@@ -21,6 +21,9 @@
 - [x] Add image upload functionality
 - [x] Add voice recording option (placeholder)
 - [x] Add file upload functionality
+- [x] Separate both sides with proper left/right alignment
+- [x] Add profile/avatars of sender on both sides
+- [x] Make responsive for all devices and sizes (mobile, tablet, desktop)
 
 ## Testing
 - [ ] Test buyer update delivery location
@@ -30,3 +33,4 @@
 - [ ] Test message delete functionality
 - [ ] Test typing indicators
 - [ ] Test image/file upload features
+- [ ] Test responsive design on different screen sizes

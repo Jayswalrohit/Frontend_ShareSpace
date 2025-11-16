@@ -250,26 +250,19 @@ const ChatInterface = ({ chatId, currentUser, otherUser, listing }: ChatInterfac
   };
 
   return (
-    <div className="chat-container" style={{
-      width: '100%',
-      maxWidth: '600px',
-      height: '100vh',
-      background: '#fff',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <div className="chat-container w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto h-screen bg-white flex flex-col">
       {/* Chat Header */}
-      <div className="flex-shrink-0 border-b border-gray-200 bg-white p-4">
-        <div className="flex items-center space-x-3">
-          <Avatar>
+      <div className="flex-shrink-0 border-b border-gray-200 bg-white p-2 sm:p-4">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <Avatar className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
             <AvatarImage src={otherUser.avatar} />
-            <AvatarFallback>
+            <AvatarFallback className="text-xs sm:text-sm">
               {otherUser.name.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <h2 className="font-semibold text-gray-900">{otherUser.name}</h2>
-            <p className="text-sm text-gray-500">
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{otherUser.name}</h2>
+            <p className="text-xs sm:text-sm text-gray-500">
               {otherUserTyping ? 'Typing...' : 'Online'}
             </p>
           </div>
@@ -277,16 +270,16 @@ const ChatInterface = ({ chatId, currentUser, otherUser, listing }: ChatInterfac
 
         {/* Listing Context */}
         {listing && (
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-center space-x-3">
+          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <img
                 src={listing.images[0]?.url || '/placeholder-image.jpg'}
                 alt="Product"
-                className="w-12 h-12 rounded-md object-cover"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-md object-cover flex-shrink-0"
               />
-              <div>
-                <h4 className="font-medium text-gray-900">{listing.title}</h4>
-                <p className="text-sm text-gray-600">₹{(listing.price * 83).toLocaleString('en-IN')}</p>
+              <div className="min-w-0 flex-1">
+                <h4 className="font-medium text-gray-900 text-sm sm:text-base truncate">{listing.title}</h4>
+                <p className="text-xs sm:text-sm text-gray-600">₹{(listing.price * 83).toLocaleString('en-IN')}</p>
               </div>
             </div>
           </div>
@@ -294,12 +287,12 @@ const ChatInterface = ({ chatId, currentUser, otherUser, listing }: ChatInterfac
       </div>
 
       {/* Messages - Full height scrolling */}
-      <div className="messages flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50" style={{scrollBehavior: 'smooth'}}>
+      <div className="messages flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50">
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500">
             <div className="text-center">
-              <p className="text-lg mb-2">No messages yet</p>
-              <p className="text-sm">Start a conversation!</p>
+              <p className="text-sm sm:text-lg mb-2">No messages yet</p>
+              <p className="text-xs sm:text-sm">Start a conversation!</p>
             </div>
           </div>
         ) : (
@@ -309,50 +302,98 @@ const ChatInterface = ({ chatId, currentUser, otherUser, listing }: ChatInterfac
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className={`message flex ${message.sender._id === currentUser._id ? 'justify-end' : 'justify-start'}`}
-              style={{
-                backgroundColor: '#e1ffc7',
-                padding: '8px 12px',
-                borderRadius: '10px',
-                marginBottom: '8px',
-                maxWidth: '75%',
-                alignSelf: message.sender._id === currentUser._id ? 'flex-end' : 'flex-start',
-                wordWrap: 'break-word',
-                position: 'relative'
-              }}
+              className={`message flex w-full mb-3 sm:mb-4 px-1 sm:px-2 ${
+                message.sender._id === currentUser._id ? 'justify-end' : 'justify-start'
+              }`}
             >
-              <div className="flex-1">
-                <p className="text-sm mb-1">{message.content}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">{formatTime(message.createdAt)}</span>
-                  {message.sender._id === currentUser._id && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-4 w-4 p-0 ml-2">
-                          <MoreVertical className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteMessage(message._id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+              {message.sender._id !== currentUser._id && (
+                <Avatar className="w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 flex-shrink-0">
+                  <AvatarImage src={message.sender.avatar} />
+                  <AvatarFallback className="text-xs sm:text-sm">
+                    {message.sender.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              )}
+
+              <div className={`flex flex-col ${
+                message.sender._id === currentUser._id ? 'items-end' : 'items-start'
+              } max-w-[75%] sm:max-w-xs md:max-w-md lg:max-w-lg`}>
+                {message.sender._id !== currentUser._id && (
+                  <span className="text-xs font-medium text-gray-600 mb-1 ml-1 hidden sm:block">
+                    {message.sender.name}
+                  </span>
+                )}
+
+                <div
+                  className={`rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-sm ${
+                    message.sender._id === currentUser._id
+                      ? 'bg-blue-600 text-white rounded-br-md'
+                      : 'bg-white text-gray-900 rounded-bl-md border border-gray-200'
+                  }`}
+                  style={{
+                    wordWrap: 'break-word',
+                    position: 'relative'
+                  }}
+                >
+                  <p className="text-sm sm:text-base leading-relaxed">{message.content}</p>
+
+                  <div className={`flex items-center justify-between mt-2 ${
+                    message.sender._id === currentUser._id ? 'flex-row-reverse' : 'flex-row'
+                  }`}>
+                    <span className={`text-xs ${
+                      message.sender._id === currentUser._id ? 'text-blue-100' : 'text-gray-500'
+                    }`}>
+                      {formatTime(message.createdAt)}
+                    </span>
+
+                    {message.sender._id === currentUser._id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 ml-2 hover:bg-blue-700 rounded-full opacity-70 hover:opacity-100"
+                          >
+                            <MoreVertical className="h-3 w-3 text-blue-100" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteMessage(message._id)}
+                            className="text-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
                 </div>
               </div>
+
+              {message.sender._id === currentUser._id && (
+                <Avatar className="w-8 h-8 sm:w-10 sm:h-10 ml-2 sm:ml-3 flex-shrink-0">
+                  <AvatarImage src={message.sender.avatar} />
+                  <AvatarFallback className="text-xs sm:text-sm">
+                    {message.sender.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              )}
             </motion.div>
           ))
         )}
 
         {/* Typing Indicator */}
         {otherUserTyping && (
-          <div className="flex justify-start">
-            <div className="bg-gray-200 rounded-lg px-3 py-2">
+          <div className="flex justify-start w-full px-1 sm:px-2 mb-3 sm:mb-4">
+            <Avatar className="w-8 h-8 sm:w-10 sm:h-10 mr-2 sm:mr-3 flex-shrink-0">
+              <AvatarImage src={otherUser.avatar} />
+              <AvatarFallback className="text-xs sm:text-sm">
+                {otherUser.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            <div className="bg-gray-200 rounded-2xl rounded-bl-md px-3 sm:px-4 py-2 sm:py-3 shadow-sm">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -366,35 +407,35 @@ const ChatInterface = ({ chatId, currentUser, otherUser, listing }: ChatInterfac
       </div>
 
       {/* Message Input - Fixed at bottom */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-white p-4">
+      <div className="flex-shrink-0 border-t border-gray-200 bg-white p-2 sm:p-4">
         {/* Media Upload Buttons */}
-        <div className="flex items-center space-x-2 mb-3">
+        <div className="flex items-center space-x-1 sm:space-x-2 mb-2 sm:mb-3">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleImageUpload}
-            className="p-2"
+            className="h-8 w-8 sm:h-10 sm:w-10 p-0"
           >
-            <Image className="h-4 w-4" />
+            <Image className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleVoiceRecord}
-            className="p-2"
+            className="h-8 w-8 sm:h-10 sm:w-10 p-0"
           >
-            <Mic className="h-4 w-4" />
+            <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={handleFileUpload}
-            className="p-2"
+            className="h-8 w-8 sm:h-10 sm:w-10 p-0"
           >
-            <Paperclip className="h-4 w-4" />
+            <Paperclip className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
 
@@ -414,19 +455,19 @@ const ChatInterface = ({ chatId, currentUser, otherUser, listing }: ChatInterfac
         />
 
         {/* Message Input Form */}
-        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex space-x-2">
+        <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex space-x-1 sm:space-x-2">
           <input
             type="text"
             value={newMessage}
             onChange={handleTyping}
             placeholder="Type your message..."
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
             autoComplete="off"
           />
           <Button
             type="submit"
             disabled={sendingMessage || !newMessage.trim()}
-            className="bg-green-600 hover:bg-green-700 px-6"
+            className="bg-green-600 hover:bg-green-700 px-3 sm:px-4 h-10 min-w-[40px]"
           >
             <Send className="h-4 w-4" />
           </Button>
