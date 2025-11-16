@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useSearchParams, useParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -43,7 +43,6 @@ interface User {
 
 const Chat = () => {
   const [searchParams] = useSearchParams();
-  const { chatId } = useParams<{ chatId: string }>();
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -54,17 +53,23 @@ const Chat = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token);
-    
+
     if (token) {
       fetchUserData();
-      fetchChats();
     }
   }, []);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      fetchChats();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  useEffect(() => {
     const sellerId = searchParams.get('seller');
     if (sellerId && chats.length > 0) {
-      const chatWithSeller = chats.find(chat => 
+      const chatWithSeller = chats.find(chat =>
         chat.participants.some(p => p._id === sellerId)
       );
       if (chatWithSeller) {
@@ -87,7 +92,7 @@ const Chat = () => {
       setLoading(true);
       const response = await axios.get('/api/chat');
       setChats(response.data);
-      
+
       // If no chat is selected and we have chats, select the first one
       if (!selectedChat && response.data.length > 0) {
         setSelectedChat(response.data[0]);
@@ -118,7 +123,7 @@ const Chat = () => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor(diffInHours * 60);
       return `${diffInMinutes}m ago`;
@@ -158,28 +163,6 @@ const Chat = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading chats...</p>
         </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Login to Access Chat</h2>
-          <p className="text-gray-600 mb-6">You need to be logged in to message other users.</p>
-          <Link to="/login">
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              Login to Continue
-            </Button>
-          </Link>
-        </motion.div>
       </div>
     );
   }
@@ -237,11 +220,11 @@ const Chat = () => {
                             {formatTime(chat.lastMessage?.timestamp)}
                           </span>
                         </div>
-                        
+
                         <p className="text-sm text-gray-600 mb-1">
                           Re: {chat.listing.title}
                         </p>
-                        
+
                         <div className="flex items-center justify-between">
                           <p className="text-sm text-gray-500 truncate">
                             {chat.lastMessage?.content}
@@ -263,7 +246,7 @@ const Chat = () => {
           {/* Chat Area */}
           <div className="md:col-span-8 lg:col-span-9 bg-white flex flex-col">
             {selectedChat && currentUser ? (
-              <ChatInterface 
+              <ChatInterface
                 chatId={selectedChat._id}
                 currentUser={currentUser}
                 otherUser={getOtherParticipant(selectedChat) || { _id: '', name: 'Unknown', avatar: '' }}
